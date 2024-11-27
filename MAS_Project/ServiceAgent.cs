@@ -7,8 +7,8 @@ namespace Proiect_MAS
 {
     public class ServiceAgent : Agent
     {
-        private List<Flight> Flights { get; }
-        public string Company { get; }
+        public List<Flight> Flights { get; set; }
+        public string Company { get; set; }
 
         public ServiceAgent(string company, List<Flight> flights)
         {
