@@ -1,50 +1,59 @@
-﻿using System;
+﻿using ActressMas;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ActressMas;
 
 namespace Proiect_MAS
 {
     public class AssistantAgent : Agent
     {
-        private List<ServiceAgent> AirlineAgents { get; } = new List<ServiceAgent>();
         private List<Flight> Flights { get; } = new List<Flight>();
-
-        public AssistantAgent(List<ServiceAgent> airlineAgents)
+        public string Departure { get; set; }
+        public string Destination { get; set; }
+        public DateTime DepartureTime { get; set; }
+        public DateTime ArrivalTime { get; set; }
+        public int FlexibleNo { get; set; }
+        public AssistantAgent() { }
+        public AssistantAgent(string departure, string destination, DateTime departureTime, DateTime arrivalTime)
         {
-            AirlineAgents = airlineAgents;
+            Departure = departure;
+            Destination = destination;
+            DepartureTime = departureTime;
+            ArrivalTime = arrivalTime;
         }
 
         public override void Setup()
         {
-            foreach (var agent in AirlineAgents)
-            {
-                Send(agent.Company, "SearchFlight Bucuresti Paris"); 
-            }
+            Broadcast($"SearchFlight {Departure} {Destination} {DepartureTime.ToString("MM/dd/yyyy HH:mm")} {ArrivalTime.ToString("MM/dd/yyyy HH:mm")} {FlexibleNo}");
         }
 
         public override void Act(Message message)
         {
             if (message.Content.StartsWith("Flight"))
             {
-                var parts = message.Content.Split(' ');
-                var flight = new Flight(parts[1], parts[2], double.Parse(parts[3]), double.Parse(parts[4]), parts[5]);
+                var parts = message.Content.Split(';');
+                var flight = new Flight(
+                    departure: parts[1],
+                    destination: parts[2],
+                    departureTime: DateTime.Parse(parts[3]),
+                    arrivalTime: DateTime.Parse(parts[4]),
+                    price: double.Parse(parts[5])
+                );
                 Flights.Add(flight);
+                var company = parts[6];
+                var bestRoutes = Flights
+                    .OrderBy(f => f.Price)
+                    .ThenBy(f => f.ArrivalTime - f.DepartureTime)
+                    .Take(4)
+                    .ToList();
 
-                if (Flights.Count >= AirlineAgents.Count)
+                Console.WriteLine("Optimal routes:");
+                Console.WriteLine("-------------");
+                foreach (var route in bestRoutes)
                 {
-                    var bestRoutes = Flights
-                        .OrderBy(f => f.Price)
-                        .ThenBy(f => f.Duration)
-                        .Take(4)
-                        .ToList();
-
-                    Console.WriteLine("Optimal routes:");
-                    foreach (var route in bestRoutes)
-                    {
-                        Console.WriteLine($"{route.Departure} -> {route.Destination}, {route.Duration}h, {route.Price} EUR, ({route.Company})");
-                    }
+                    Console.WriteLine($"{route.Departure} -> {route.Destination}, {route.ArrivalTime - route.DepartureTime}h, {route.Price} EUR, Company {message.Sender}");
                 }
+                Console.WriteLine("-------------\n");
             }
         }
     }

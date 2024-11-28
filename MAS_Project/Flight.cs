@@ -6,22 +6,22 @@ namespace Proiect_MAS
     {
         public string Departure { get; }
         public string Destination { get; }
-        public double Duration { get; }
+        public DateTime DepartureTime { get; }
+        public DateTime ArrivalTime { get; }
         public double Price { get; }
-        public string Company { get; set; }
 
-        public Flight(string departure, string destination, double duration, double price, string company)
+        public Flight(string departure, string destination, DateTime departureTime, DateTime arrivalTime, double price)
         {
             Departure = departure;
             Destination = destination;
-            Duration = duration;
+            DepartureTime = departureTime;
+            ArrivalTime = arrivalTime;
             Price = price;
-            Company = company;
         }
 
         public override string ToString()
         {
-            return $"{Departure} -> {Destination}, {Duration}h, {Price} EUR, ({Company})";
+            return $"{Departure} -> {Destination}, {DepartureTime.ToString()} -> {ArrivalTime.ToString()}, {Price} EUR";
         }
     }
 }

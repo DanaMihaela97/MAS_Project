@@ -4,7 +4,7 @@ namespace Proiect_MAS
 {
     public class BuilderAgent
     {
-        ServiceAgent serviceAgent = new ServiceAgent(null, null);
+        private ServiceAgent serviceAgent = new ServiceAgent(null, null);
         public BuilderAgent() { 
             this.Reset();
         }

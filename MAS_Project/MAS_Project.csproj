@@ -37,7 +37,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuilderAgent.cs" />
-    <Compile Include="FactoryAgent.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ServiceAgent.cs" />
     <Compile Include="AssistantAgent.cs" />
