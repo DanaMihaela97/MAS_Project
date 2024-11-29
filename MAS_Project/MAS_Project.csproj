@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ActressMas">
-      <HintPath>..\..\ActressMas.dll</HintPath>
+      <HintPath>..\..\..\Downloads\ActressMas-20241125\.net4.6\ActressMas.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
