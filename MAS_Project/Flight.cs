@@ -9,6 +9,10 @@ namespace Proiect_MAS
         public DateTime DepartureTime { get; }
         public DateTime ArrivalTime { get; }
         public double Price { get; }
+        public Flight Parent { get; } = null;
+        public int G { get; set; }
+        public int H { get; set; }
+        public int F { get; set; }
 
         public Flight(string departure, string destination, DateTime departureTime, DateTime arrivalTime, double price)
         {

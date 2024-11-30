@@ -8,14 +8,16 @@ namespace Proiect_MAS
 {
     public class AssistantAgent : Agent
     {
-        private List<Flight> Flights { get; } = new List<Flight>();
         public string Departure { get; set; }
         public string Destination { get; set; }
         public DateTime DepartureTime { get; set; }
         public DateTime ArrivalTime { get; set; }
         public int FlexibleNo { get; set; }
         private Timer _timer;
+
+        private List<Flight> _receivedFlights = new List<Flight>();
         private Stack<Flight> _openList = new Stack<Flight>();
+        private List<Flight> _closedList = new List<Flight>();
         public AssistantAgent() { }
         public AssistantAgent(string departure, string destination, DateTime departureTime, DateTime arrivalTime)
         {
@@ -31,29 +33,30 @@ namespace Proiect_MAS
         private void t_Elapsed(object sender, ElapsedEventArgs e)
         {
 
-            if (Flights.Count > 0)
+            if (_receivedFlights.Count > 0)
             {
-                var bestRoutes = Flights
+                var bestRoutes = _receivedFlights
                 .OrderBy(f => f.ArrivalTime - f.DepartureTime)
-                .ThenBy(f => f.Price)
+                //.OrderBy(f => f.Price)
+                //.ThenBy(f => f.Price)
                 .ToList();
 
-                Console.WriteLine("Optimal routes:");
-                Console.WriteLine("-------------");
-                foreach (var route in bestRoutes)
-                {
-                    Console.WriteLine($"{route.Departure} -> {route.Destination}, {route.ArrivalTime - route.DepartureTime}h, {route.Price} EUR");
-                }
-                Console.WriteLine("-------------\n");
+                //Console.WriteLine("Optimal routes:");
+                //Console.WriteLine("-------------");
+                //foreach (var route in bestRoutes)
+                //{
+                //    Console.WriteLine($"{route.Departure} -> {route.Destination}, {route.ArrivalTime - route.DepartureTime}h, {route.Price} EUR");
+                //}
+                //Console.WriteLine("-------------\n");
                 _openList.Push(bestRoutes[0]);
-                Flights.Clear();
+                _receivedFlights.Clear();
             }
-
-            var searchFlight = _openList.Peek();
+            var searchFlight = _openList.Pop();
+            _closedList.Add(searchFlight);
             string message = $"SearchFlight {searchFlight.Destination} {Destination} {searchFlight.DepartureTime.ToString("MM/dd/yyyy HH:mm")} {ArrivalTime.ToString("MM/dd/yyyy HH:mm")} {FlexibleNo}";
-            Console.WriteLine(message);
+            Console.WriteLine("\n" + message);
             Broadcast(message);
-            _openList.Pop();
+
         }
 
 
@@ -69,7 +72,33 @@ namespace Proiect_MAS
             string action; string parameters;
             Utils.ParseMessage(message.Content, out action, out parameters, separator);
 
-            if (action == "Flight")
+            switch (action)
+            {
+                case "Flight":
+                    {
+                        HandleFlight(parameters, separator); break;
+                    }
+                default:
+                    {
+                        if (_timer.Enabled)
+                        {
+                            Console.WriteLine("Found the route");
+                            Console.WriteLine("-------------");
+                            foreach (var flight in _closedList)
+                            {
+                                Console.WriteLine(flight);
+                            }
+                            Console.WriteLine("-------------\n");
+                            _timer.Stop();
+                            Stop();
+                        }
+                        break;
+                    }
+            }
+        }
+        void HandleFlight(string parameters, char separator)
+        {
+            if (_timer.Enabled)
             {
                 var args = parameters.Split(separator);
                 var flight = new Flight(
@@ -79,7 +108,13 @@ namespace Proiect_MAS
                     arrivalTime: DateTime.Parse(args[3]),
                     price: double.Parse(args[4])
                 );
-                Flights.Add(flight);
+                if (args[1] == Destination)
+                {
+                    Send(this.Name, "Stop");
+                    _closedList.Add(flight);
+                    return;
+                }
+                _receivedFlights.Add(flight);
                 var company = args[5];
             }
         }
