@@ -41,7 +41,7 @@ namespace Proiect_MAS
                            arrivalTime: new DateTime(2008, 6, 1, 7, 59, 0), price: 150),
                 new Flight(departure: "Arad", destination: "Timisoara",
                            departureTime: new DateTime(2008, 6, 1, 7, 0, 0),
-                           arrivalTime: new DateTime(2008, 6, 1, 7, 32, 0), price: 120),
+                           arrivalTime: new DateTime(2008, 6, 1, 17, 32, 0), price: 120),
                 new Flight(departure: "Sibiu", destination: "Arad",
                            departureTime: new DateTime(2008, 6, 1, 7, 47, 0),
                            arrivalTime: new DateTime(2008, 6, 1, 7, 47, 0), price: 180),
@@ -80,10 +80,7 @@ namespace Proiect_MAS
                            arrivalTime: new DateTime(2008, 6, 1, 7, 47, 0), price: 100),
                 new Flight(departure: "Cluj", destination: "Arad",
                            departureTime: new DateTime(2008, 6, 1, 6, 16, 0),
-                           arrivalTime: new DateTime(2008, 6, 1, 7, 44, 0), price: 150),
-                new Flight(departure: "Arad", destination: "Brasov",
-                           departureTime: new DateTime(2008, 6, 1, 4, 47, 0),
-                           arrivalTime: new DateTime(2008, 6, 1, 9, 47, 0), price: 10),
+                           arrivalTime: new DateTime(2008, 6, 1, 7, 44, 0), price: 150)
             });
             var ozoneAgent = builder.GetServiceAgent();
 

@@ -1,8 +1,8 @@
 ﻿using ActressMas;
-using MAS_Project;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Timers;
 
 namespace Proiect_MAS
 {
@@ -14,18 +14,53 @@ namespace Proiect_MAS
         public DateTime DepartureTime { get; set; }
         public DateTime ArrivalTime { get; set; }
         public int FlexibleNo { get; set; }
+        private Timer _timer;
+        private Stack<Flight> _openList = new Stack<Flight>();
         public AssistantAgent() { }
         public AssistantAgent(string departure, string destination, DateTime departureTime, DateTime arrivalTime)
         {
+            _timer = new Timer();
+            _timer.Elapsed += t_Elapsed;
+            _timer.Interval = Utils.Delay;
             Departure = departure;
             Destination = destination;
             DepartureTime = departureTime;
             ArrivalTime = arrivalTime;
+            _openList.Push(new Flight(departure, departure, departureTime, arrivalTime, 0));
         }
+        private void t_Elapsed(object sender, ElapsedEventArgs e)
+        {
+
+            if (Flights.Count > 0)
+            {
+                var bestRoutes = Flights
+                .OrderBy(f => f.ArrivalTime - f.DepartureTime)
+                .ThenBy(f => f.Price)
+                .ToList();
+
+                Console.WriteLine("Optimal routes:");
+                Console.WriteLine("-------------");
+                foreach (var route in bestRoutes)
+                {
+                    Console.WriteLine($"{route.Departure} -> {route.Destination}, {route.ArrivalTime - route.DepartureTime}h, {route.Price} EUR");
+                }
+                Console.WriteLine("-------------\n");
+                _openList.Push(bestRoutes[0]);
+                Flights.Clear();
+            }
+
+            var searchFlight = _openList.Peek();
+            string message = $"SearchFlight {searchFlight.Destination} {Destination} {searchFlight.DepartureTime.ToString("MM/dd/yyyy HH:mm")} {ArrivalTime.ToString("MM/dd/yyyy HH:mm")} {FlexibleNo}";
+            Console.WriteLine(message);
+            Broadcast(message);
+            _openList.Pop();
+        }
+
 
         public override void Setup()
         {
-            Broadcast($"SearchFlight {Departure} {Destination} {DepartureTime.ToString("MM/dd/yyyy HH:mm")} {ArrivalTime.ToString("MM/dd/yyyy HH:mm")} {FlexibleNo}");
+            _timer.Start();
+            //Broadcast($"SearchFlight {Departure} {Destination} {DepartureTime.ToString("MM/dd/yyyy HH:mm")} {ArrivalTime.ToString("MM/dd/yyyy HH:mm")} {FlexibleNo}");
         }
 
         public override void Act(Message message)
@@ -46,19 +81,6 @@ namespace Proiect_MAS
                 );
                 Flights.Add(flight);
                 var company = args[5];
-                var bestRoutes = Flights
-                    .OrderBy(f => f.Price)
-                    .ThenBy(f => f.ArrivalTime - f.DepartureTime)
-                    .Take(4)
-                    .ToList();
-
-                Console.WriteLine("Optimal routes:");
-                Console.WriteLine("-------------");
-                foreach (var route in bestRoutes)
-                {
-                    Console.WriteLine($"{route.Departure} -> {route.Destination}, {route.ArrivalTime - route.DepartureTime}h, {route.Price} EUR, Company {message.Sender}");
-                }
-                Console.WriteLine("-------------\n");
             }
         }
     }

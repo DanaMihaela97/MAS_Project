@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MAS_Project
+namespace Proiect_MAS
 {
     public class Utils
     {
@@ -11,7 +11,7 @@ namespace MAS_Project
         public static int MaxPrice = 1000;
         public static int Increment = 10;
 
-        public static int Delay = 1000;
+        public static int Delay = 2500;
         public static Random RandNoGen = new Random();
         public static List<int> winningPrices = new List<int>();
         public static void ParseMessage(string content, out string action, out string parameters, char separator = ' ')
