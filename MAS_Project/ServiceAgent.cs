@@ -1,4 +1,5 @@
 ﻿using ActressMas;
+using MAS_Project;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,15 +19,16 @@ namespace Proiect_MAS
 
         public override void Act(Message message)
         {
-            var content = message.Content;
-            var parts = content.Split(' ');
+            string action; string parameters;
+            Utils.ParseMessage(message.Content, out action, out parameters);
 
-            if (parts[0] == "SearchFlight")
+            if (action == "SearchFlight")
             {
-                var departure = parts[1];
-                var destination = parts[2];
-                var departureDate = DateTime.Parse(parts[3]);
-                var arrivalDate = DateTime.Parse(parts[4]);
+                var args = parameters.Split(' ');
+                var departure = args[0];
+                var destination = args[1];
+                var departureDate = DateTime.Parse(args[2]);
+                var arrivalDate = DateTime.Parse(args[3]);
                 // var flexibleNo = parts[5];
 
                 var results_departure = Flights
@@ -36,6 +38,7 @@ namespace Proiect_MAS
                 var direct_flight = Flights
                     .Where(f => f.Departure == departure && f.Destination == destination)
                     .ToList();
+
                 if (direct_flight.Any())
                 {
                     results_departure.AddRange(direct_flight);

@@ -41,6 +41,7 @@
     <Compile Include="ServiceAgent.cs" />
     <Compile Include="AssistantAgent.cs" />
     <Compile Include="Flight.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ActressMas">

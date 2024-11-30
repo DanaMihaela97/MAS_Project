@@ -1,4 +1,5 @@
 ﻿using ActressMas;
+using MAS_Project;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,18 +30,22 @@ namespace Proiect_MAS
 
         public override void Act(Message message)
         {
-            if (message.Content.StartsWith("Flight"))
+            char separator = ';';
+            string action; string parameters;
+            Utils.ParseMessage(message.Content, out action, out parameters, separator);
+
+            if (action == "Flight")
             {
-                var parts = message.Content.Split(';');
+                var args = parameters.Split(separator);
                 var flight = new Flight(
-                    departure: parts[1],
-                    destination: parts[2],
-                    departureTime: DateTime.Parse(parts[3]),
-                    arrivalTime: DateTime.Parse(parts[4]),
-                    price: double.Parse(parts[5])
+                    departure: args[0],
+                    destination: args[1],
+                    departureTime: DateTime.Parse(args[2]),
+                    arrivalTime: DateTime.Parse(args[3]),
+                    price: double.Parse(args[4])
                 );
                 Flights.Add(flight);
-                var company = parts[6];
+                var company = args[5];
                 var bestRoutes = Flights
                     .OrderBy(f => f.Price)
                     .ThenBy(f => f.ArrivalTime - f.DepartureTime)
