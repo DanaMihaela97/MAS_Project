@@ -16,8 +16,9 @@ namespace Proiect_MAS
         private Timer _timer;
 
         private List<Flight> _receivedFlights = new List<Flight>();
-        private Stack<Flight> _openList = new Stack<Flight>();
+        private List<Flight> _openList = new List<Flight>();
         private List<Flight> _closedList = new List<Flight>();
+        private Flight _searchFlight;
         public AssistantAgent() { }
         public AssistantAgent(string departure, string destination, DateTime departureTime, DateTime arrivalTime)
         {
@@ -28,42 +29,31 @@ namespace Proiect_MAS
             Destination = destination;
             DepartureTime = departureTime;
             ArrivalTime = arrivalTime;
-            _openList.Push(new Flight(departure, departure, departureTime, arrivalTime, 0));
+            _openList.Add(new Flight(departure, departure, departureTime, arrivalTime, 0));
         }
         private void t_Elapsed(object sender, ElapsedEventArgs e)
         {
-
-            if (_receivedFlights.Count > 0)
+            _openList = _openList.OrderBy(f => f.GetF()).ToList();
+            if (_openList.Count > 0)
             {
-                var bestRoutes = _receivedFlights
-                .OrderBy(f => f.ArrivalTime - f.DepartureTime)
-                //.OrderBy(f => f.Price)
-                //.ThenBy(f => f.Price)
-                .ToList();
-
-                //Console.WriteLine("Optimal routes:");
-                //Console.WriteLine("-------------");
-                //foreach (var route in bestRoutes)
-                //{
-                //    Console.WriteLine($"{route.Departure} -> {route.Destination}, {route.ArrivalTime - route.DepartureTime}h, {route.Price} EUR");
-                //}
-                //Console.WriteLine("-------------\n");
-                _openList.Push(bestRoutes[0]);
-                _receivedFlights.Clear();
+                _searchFlight = _openList[0];
+                _openList.Remove(_searchFlight);
+                if (_searchFlight.Destination == Destination)
+                {
+                    Send(this.Name, "Stop");
+                    return;
+                }
+                string message = $"SearchFlight {_searchFlight.Destination} {Destination} {_searchFlight.DepartureTime.ToString("MM/dd/yyyy HH:mm")} {ArrivalTime.ToString("MM/dd/yyyy HH:mm")} {FlexibleNo}";
+                Console.WriteLine("\n" + message);
+                Broadcast(message);
+                _closedList.Add(_searchFlight);
             }
-            var searchFlight = _openList.Pop();
-            _closedList.Add(searchFlight);
-            string message = $"SearchFlight {searchFlight.Destination} {Destination} {searchFlight.DepartureTime.ToString("MM/dd/yyyy HH:mm")} {ArrivalTime.ToString("MM/dd/yyyy HH:mm")} {FlexibleNo}";
-            Console.WriteLine("\n" + message);
-            Broadcast(message);
-
         }
 
 
         public override void Setup()
         {
             _timer.Start();
-            //Broadcast($"SearchFlight {Departure} {Destination} {DepartureTime.ToString("MM/dd/yyyy HH:mm")} {ArrivalTime.ToString("MM/dd/yyyy HH:mm")} {FlexibleNo}");
         }
 
         public override void Act(Message message)
@@ -78,45 +68,45 @@ namespace Proiect_MAS
                     {
                         HandleFlight(parameters, separator); break;
                     }
+                case "Rewind":
+                    {
+                        _closedList.RemoveAt(_closedList.Count - 1); break;
+                    }
                 default:
                     {
-                        if (_timer.Enabled)
+                        Console.WriteLine("Found the route");
+                        Console.WriteLine("-------------");
+                        foreach (var flight in _closedList)
                         {
-                            Console.WriteLine("Found the route");
-                            Console.WriteLine("-------------");
-                            foreach (var flight in _closedList)
-                            {
-                                Console.WriteLine(flight);
-                            }
-                            Console.WriteLine("-------------\n");
-                            _timer.Stop();
-                            Stop();
+                            Console.WriteLine(flight);
                         }
+                        Console.WriteLine("-------------\n");
+                        _closedList.Clear();
+                        _openList.Clear();
                         break;
                     }
             }
         }
         void HandleFlight(string parameters, char separator)
         {
-            if (_timer.Enabled)
+            var args = parameters.Split(separator);
+            var flight = new Flight(
+                departure: args[0],
+                destination: args[1],
+                departureTime: DateTime.Parse(args[2]),
+                arrivalTime: DateTime.Parse(args[3]),
+                price: double.Parse(args[4])
+            );
+            flight.SetParent(_searchFlight);
+            var company = args[5];
+            foreach (var flightElem in _openList)
             {
-                var args = parameters.Split(separator);
-                var flight = new Flight(
-                    departure: args[0],
-                    destination: args[1],
-                    departureTime: DateTime.Parse(args[2]),
-                    arrivalTime: DateTime.Parse(args[3]),
-                    price: double.Parse(args[4])
-                );
-                if (args[1] == Destination)
+                if (flightElem.Destination == flight.Destination && flightElem.Departure == flight.Departure)
                 {
-                    Send(this.Name, "Stop");
-                    _closedList.Add(flight);
                     return;
                 }
-                _receivedFlights.Add(flight);
-                var company = args[5];
             }
+            _openList.Add(flight);
         }
     }
 }
