@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ActressMas">
-      <HintPath>..\..\ActressMas-20241130\.net4.6\ActressMas.dll</HintPath>
+      <HintPath>..\..\ActressMas.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>

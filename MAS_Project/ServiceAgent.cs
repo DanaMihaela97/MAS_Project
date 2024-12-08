@@ -34,14 +34,8 @@ namespace Proiect_MAS
                     .Where(f => f.Departure == departure)
                     .ToList();
 
-                var direct_flight = Flights
-                    .Where(f => f.Departure == departure && f.Destination == destination)
-                    .ToList();
+                //Console.WriteLine(results_departure.Count);
 
-                if (direct_flight.Any())
-                {
-                    results_departure.AddRange(direct_flight);
-                }
                 foreach (var flight in results_departure)
                 {
                     var msg = $"Flight;{flight.Departure};{flight.Destination};{flight.DepartureTime};{flight.ArrivalTime};{flight.Price};{this.Company}";

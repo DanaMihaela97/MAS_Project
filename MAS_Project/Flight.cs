@@ -24,18 +24,18 @@ namespace Proiect_MAS
 
         public override string ToString()
         {
-            return $"{Departure} -> {Destination}, {DepartureTime.ToString()} -> {ArrivalTime.ToString()}, {Price} EUR";
+            return $"{Departure} -> {Destination}, {DepartureTime.ToString()} -> {ArrivalTime.ToString()}, {Price} EUR, F = {GetF()}";
         }
         public double GetF()
         {
-            H = Price;
+            H = Utils.GetHeuristic(Destination);
             if (_parent == null)
             {
                 G = 0;
             }
             else
             {
-                G = _parent.Price;
+                G = Price;
             }
             return G + H;
         }
@@ -45,10 +45,11 @@ namespace Proiect_MAS
         }
         public void SetParent(Flight flight)
         {
-            if ((flight.ArrivalTime - flight.DepartureTime).TotalSeconds != 0)
-            {
-                _parent = flight;
-            }
+            _parent = flight;
+        }
+        public int GetDuration()
+        {
+            return (ArrivalTime - DepartureTime).Minutes;
         }
     }
 }

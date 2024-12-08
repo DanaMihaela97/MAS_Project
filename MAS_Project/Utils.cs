@@ -5,7 +5,20 @@ namespace Proiect_MAS
 {
     public class Utils
     {
-        public static int NoBidders = 5;
+        private static Dictionary<string, int> CityCode = new Dictionary<string, int>()
+        {
+            { "Arad", 0 },
+            { "Bucuresti" , 1 },
+            { "Craiova" ,2 },
+            {"Fagaras" , 3 },
+            {"Oradea" , 4 },
+            {"Pitesti" , 5 },
+            {"Rimnicu_Valcea" , 6 },
+            {"Sibiu", 7 },
+           { "Timisoara", 8 },
+            {"Zerind", 9 }
+        };
+        public static int NoAgents = 3;
         public static int ReservePrice = 100;
         public static int MinPrice = 0;
         public static int MaxPrice = 1000;
@@ -39,5 +52,11 @@ namespace Proiect_MAS
         {
             winningPrices.Add(price);
         }
+        public static int GetHeuristic(string city)
+        {
+            return distanceDict[CityCode[city]];
+        }
+        public static int[] distanceDict =
+        {366, 0, 160, 176, 380, 100, 193, 253, 329, 374};
     }
 }
