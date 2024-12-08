@@ -29,10 +29,24 @@ namespace Proiect_MAS
             Destination = destination;
             DepartureTime = departureTime;
             ArrivalTime = arrivalTime;
-            _openList.Add(new Flight(departure, departure, departureTime, arrivalTime, 0));
+            _openList.Add(new Flight(departure, departure, departureTime, arrivalTime, 0, "StartingPoint"));
         }
         private void t_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if (_openList.Count == 0 || _solutions.Count == 4)
+            {
+                Console.WriteLine($"___________________________________________________");
+                Console.WriteLine($"Found solutions:");
+                foreach (var solution in _solutions)
+                {
+                    Console.WriteLine($"\nSolution: {_solutions.IndexOf(solution) + 1}");
+                    PrintSolution(solution);
+                }
+                Console.WriteLine($"___________________________________________________");
+                Stop();
+                _timer.Stop();
+                return;
+            }
             _openList = _openList.OrderBy(f => f.Price).ToList();
 
             //if (_openList.Count > 0 && _closedList.Count > 0 && _openList[0].Departure != _closedList[_closedList.Count - 1].Destination)
@@ -88,19 +102,19 @@ namespace Proiect_MAS
             string action; string parameters;
             Utils.ParseMessage(message.Content, out action, out parameters, separator);
 
-            if (_solutions.Count == 4)
-            {
-                Console.WriteLine($"___________________________________________________");
-                Console.WriteLine($"Found solutions:");
-                foreach (var solution in _solutions)
-                {
-                    Console.WriteLine($"\nSolution: {_solutions.IndexOf(solution) + 1}");
-                    PrintSolution(solution);
-                }
-                Console.WriteLine($"___________________________________________________");
-                Stop();
-                _timer.Stop();
-            }
+            //if (_solutions.Count == 4)
+            //{
+            //    Console.WriteLine($"___________________________________________________");
+            //    Console.WriteLine($"Found solutions:");
+            //    foreach (var solution in _solutions)
+            //    {
+            //        Console.WriteLine($"\nSolution: {_solutions.IndexOf(solution) + 1}");
+            //        PrintSolution(solution);
+            //    }
+            //    Console.WriteLine($"___________________________________________________");
+            //    Stop();
+            //    _timer.Stop();
+            //}
             switch (action)
             {
                 case "Flight":
@@ -137,7 +151,8 @@ namespace Proiect_MAS
                 destination: args[1],
                 departureTime: DateTime.Parse(args[2]),
                 arrivalTime: DateTime.Parse(args[3]),
-                price: double.Parse(args[4])
+                price: double.Parse(args[4]),
+                agency: args[5]
             );
             if (flight.Departure == _searchFlight.Destination)
             {
@@ -176,7 +191,8 @@ namespace Proiect_MAS
             }
             foreach (var flightElem in _closedList)
             {
-                if (flightElem.Departure == flight.Departure && flightElem.Destination == flight.Destination)
+                if ((flightElem.Departure == flight.Departure && flightElem.Destination == flight.Destination) ||
+                    (flightElem.Departure == flight.Destination && flightElem.Destination == flight.Departure))
                 {
                     Console.WriteLine($"Reached {flight.Departure} -> {flight.Destination} on a shorter path.");
                     return;

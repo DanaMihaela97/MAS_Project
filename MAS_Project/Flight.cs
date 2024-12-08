@@ -12,6 +12,7 @@ namespace Proiect_MAS
         private Flight _parent = null;
         public double G { get; set; }
         public double H { get; set; }
+        public string Agency { get; set; }
 
         public Flight(string departure, string destination, DateTime departureTime, DateTime arrivalTime, double price)
         {
@@ -22,9 +23,20 @@ namespace Proiect_MAS
             Price = price;
         }
 
+
+        public Flight(string departure, string destination, DateTime departureTime, DateTime arrivalTime, double price, string agency)
+        {
+            Departure = departure;
+            Destination = destination;
+            DepartureTime = departureTime;
+            ArrivalTime = arrivalTime;
+            Price = price;
+            Agency = agency;
+        }
+
         public override string ToString()
         {
-            return $"{Departure} -> {Destination}, {DepartureTime.ToString()} -> {ArrivalTime.ToString()}, {Price} EUR, F = {GetF()}";
+            return $"{Departure} -> {Destination}, {DepartureTime.ToString()} -> {ArrivalTime.ToString()}, {Price} EUR, F = {GetF()}, Agency = {Agency}";
         }
         public double GetF()
         {

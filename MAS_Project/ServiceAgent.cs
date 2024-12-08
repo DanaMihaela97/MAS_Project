@@ -38,7 +38,7 @@ namespace Proiect_MAS
 
                 foreach (var flight in results_departure)
                 {
-                    var msg = $"Flight;{flight.Departure};{flight.Destination};{flight.DepartureTime};{flight.ArrivalTime};{flight.Price};{this.Company}";
+                    var msg = $"Flight;{flight.Departure};{flight.Destination};{flight.DepartureTime};{flight.ArrivalTime};{flight.Price};{flight.Agency}";
                     Console.WriteLine($"{message.Receiver} -> {message.Sender}: {msg.Replace(";", " ")}");
                     Send(message.Sender, msg);
                 }

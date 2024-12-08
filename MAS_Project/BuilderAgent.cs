@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 namespace Proiect_MAS
 {
     public class BuilderAgent
     {
         private ServiceAgent serviceAgent = new ServiceAgent(null, null);
-        public BuilderAgent() { 
+        public BuilderAgent()
+        {
             this.Reset();
         }
 
@@ -20,6 +20,10 @@ namespace Proiect_MAS
         }
         public void AddFlights(List<Flight> flights)
         {
+            foreach (Flight flight in flights)
+            {
+                flight.Agency = serviceAgent.Company;
+            }
             serviceAgent.Flights = flights;
         }
         public ServiceAgent GetServiceAgent()
