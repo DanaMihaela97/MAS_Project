@@ -19,23 +19,32 @@ namespace Proiect_MAS
         public override void Act(Message message)
         {
             string action; string parameters;
-            Utils.ParseMessage(message.Content, out action, out parameters);
+            Utils.ParseMessage(message.Content, out action, out parameters, ';');
 
             if (action == "SearchFlight")
             {
-                var args = parameters.Split(' ');
+                var args = parameters.Split(';');
                 var departure = args[0];
                 var destination = args[1];
                 var departureDate = DateTime.Parse(args[2]);
                 var arrivalDate = DateTime.Parse(args[3]);
-                // var flexibleNo = parts[5];
+                var flexibleNo = int.Parse(args[4]);
 
                 var results_departure = Flights
-                    .Where(f => f.Departure == departure)
+                    .Where(f => f.Departure == departure &&
+                    (f.DepartureTime >= departureDate.AddDays(-flexibleNo) || f.DepartureTime >= departureDate.AddDays(flexibleNo)) &&
+                    (f.ArrivalTime <= arrivalDate.AddDays(flexibleNo) || f.ArrivalTime <= arrivalDate.AddDays(-flexibleNo)))
+                    //(f.DepartureTime >= departureDate.AddDays(-flexibleNo) || f.DepartureTime >= departureDate.AddDays(flexibleNo)) &&
+                    //(f.ArrivalTime <= arrivalDate.AddDays(flexibleNo) || f.ArrivalTime <= arrivalDate.AddDays(-flexibleNo)))
                     .ToList();
 
-                //Console.WriteLine(results_departure.Count);
+                //Console.WriteLine(arrivalDate);
 
+                //foreach (var flight in Flights)
+                //{
+                //    Console.WriteLine(flight);
+                //    Console.WriteLine($"{flight.DepartureTime >= departureDate.AddDays(flexibleNo)}  {flight.ArrivalTime <= arrivalDate.AddDays(flexibleNo)}");
+                //}
                 foreach (var flight in results_departure)
                 {
                     var msg = $"Flight;{flight.Departure};{flight.Destination};{flight.DepartureTime};{flight.ArrivalTime};{flight.Price};{flight.Agency}";

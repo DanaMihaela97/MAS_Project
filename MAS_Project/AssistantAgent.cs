@@ -20,7 +20,7 @@ namespace Proiect_MAS
         private List<Flight> _solutions = new List<Flight>();
         private Flight _searchFlight;
         public AssistantAgent() { }
-        public AssistantAgent(string departure, string destination, DateTime departureTime, DateTime arrivalTime)
+        public AssistantAgent(string departure, string destination, DateTime departureTime, DateTime arrivalTime, int flexibleNo)
         {
             _timer = new Timer();
             _timer.Elapsed += t_Elapsed;
@@ -29,11 +29,12 @@ namespace Proiect_MAS
             Destination = destination;
             DepartureTime = departureTime;
             ArrivalTime = arrivalTime;
+            FlexibleNo = flexibleNo;
             _openList.Add(new Flight(departure, departure, departureTime, arrivalTime, 0, "StartingPoint"));
         }
         private void t_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (_openList.Count == 0 || _solutions.Count == 4)
+            if (_openList.Count == 0/* || _solutions.Count == 4*/)
             {
                 Console.WriteLine($"___________________________________________________");
                 Console.WriteLine($"Found solutions:");
@@ -78,9 +79,12 @@ namespace Proiect_MAS
                 //    Send(this.Name, "Stop");
                 //    return;
                 //}
-                string message = $"SearchFlight {_searchFlight.Destination} {Destination} {_searchFlight.DepartureTime.ToString("MM/dd/yyyy HH:mm")} {ArrivalTime.ToString("MM/dd/yyyy HH:mm")} {FlexibleNo}";
-                Console.WriteLine("\n" + message + "\n");
-                Broadcast(message);
+                if (_searchFlight.ArrivalTime <= ArrivalTime.AddDays(FlexibleNo))
+                {
+                    string message = $"SearchFlight;{_searchFlight.Destination};{Destination};{_searchFlight.DepartureTime.ToString("MM/dd/yyyy HH:mm")};{_searchFlight.ArrivalTime.ToString("MM/dd/yyyy HH:mm")};{FlexibleNo}";
+                    Console.WriteLine("\n" + message + "\n");
+                    Broadcast(message);
+                }
                 if (!_closedList.Contains(_searchFlight))
                     _closedList.Add(_searchFlight);
             }
@@ -150,6 +154,7 @@ namespace Proiect_MAS
                 departure: args[0],
                 destination: args[1],
                 departureTime: DateTime.Parse(args[2]),
+                //departureTime: _searchFlight.ArrivalTime,
                 arrivalTime: DateTime.Parse(args[3]),
                 price: double.Parse(args[4]),
                 agency: args[5]
