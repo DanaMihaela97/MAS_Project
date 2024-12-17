@@ -51,6 +51,19 @@ namespace Proiect_MAS
             }
             return G + H;
         }
+        public double GetTotalF()
+        {
+            double totalF = 0;
+            Flight current = this; // Start with the current flight
+
+            while (current != null) // Traverse up the parent chain
+            {
+                totalF += current.GetF();
+                current = current._parent;
+            }
+
+            return totalF;
+        }
         public Flight GetParent()
         {
             return this._parent;

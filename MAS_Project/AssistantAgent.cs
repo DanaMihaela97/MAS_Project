@@ -34,11 +34,15 @@ namespace Proiect_MAS
         }
         private void t_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (_openList.Count == 0/* || _solutions.Count == 4*/)
+            if (_openList.Count == 0)
             {
                 Console.WriteLine($"___________________________________________________");
                 Console.WriteLine($"Found solutions:");
-                foreach (var solution in _solutions)
+                var topSolutions = _solutions
+                   .OrderBy(solution => solution.GetTotalF())
+                   .Take(4)
+                   .ToList();
+                foreach (var solution in topSolutions)
                 {
                     Console.WriteLine($"\nSolution: {_solutions.IndexOf(solution) + 1}");
                     PrintSolution(solution);
